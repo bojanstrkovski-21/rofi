@@ -1,3 +1,87 @@
+# Category Modes Extension
+
+This fork adds category-based application launcher modes to Rofi, allowing you to filter applications by standard FreeDesktop.org categories with clickable buttons.
+
+## Category Modes
+
+- **Apps** - All applications (no filter)
+- **Accessories** - Utility tools and accessories
+- **Development** - Programming and development tools
+- **Graphics** - Image editors, viewers, and graphics applications
+- **Multimedia** - Audio/Video players and media applications
+- **Office** - Office suites, productivity, and document tools
+- **System** - System administration and monitoring tools
+- **Settings** - Configuration and settings applications
+- **Internet** - Web browsers, email clients, and communication apps
+
+## Usage
+
+Launch Rofi with category modes:
+
+```bash
+rofi -show Apps -modi 'Apps,Accessories,Development,Internet,Graphics,Multimedia,Office,System,Settings'
+```
+
+Category buttons will appear in the mode-switcher at the bottom of the window. Click any category to filter applications by that category.
+
+### With Theme
+
+To enable the mode-switcher in your theme, ensure your theme's `mainbox` includes `mode-switcher`:
+
+```css
+mainbox {
+    children: [ inputbar, listview, mode-switcher ];
+}
+```
+
+---
+
+**Thanks to the original Rofi developers and contributors for creating this amazing application launcher!**
+
+---
+
+# Category Modes Extension
+
+This fork adds category-based application launcher modes to Rofi, allowing you to filter applications by standard FreeDesktop.org categories with clickable buttons.
+
+## Category Modes
+
+- **Apps** - All applications (no filter)
+- **Accessories** - Utility tools and accessories
+- **Development** - Programming and development tools
+- **Graphics** - Image editors, viewers, and graphics applications
+- **Multimedia** - Audio/Video players and media applications
+- **Office** - Office suites, productivity, and document tools
+- **System** - System administration and monitoring tools
+- **Settings** - Configuration and settings applications
+- **Internet** - Web browsers, email clients, and communication apps
+
+## Usage
+
+Launch Rofi with category modes:
+
+```bash
+rofi -show Apps -modi 'Apps,Accessories,Development,Internet,Graphics,Multimedia,Office,System,Settings'
+```
+
+Category buttons will appear in the mode-switcher at the bottom of the window. Click any category to filter applications by that category.
+
+### With Theme
+
+To enable the mode-switcher in your theme, ensure your theme's `mainbox` includes `mode-switcher`:
+
+```css
+mainbox {
+    children: [ inputbar, listview, mode-switcher ];
+}
+```
+
+---
+
+**Thanks to the original Rofi developers and contributors for creating this amazing application launcher!**
+
+---
+
 <p align="center">
 <a href="https://github.com/davatorium/rofi/issues"><img src="https://img.shields.io/github/issues/davatorium/rofi.svg"></a>
 <a href="https://img.shields.io/github/forks/davatorium/rofi.svg"><img src="https://img.shields.io/github/forks/davatorium/rofi.svg"></a>

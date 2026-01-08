@@ -34,53 +34,21 @@ mainbox {
 }
 ```
 
----
-
-**Thanks to the original Rofi developers and contributors for creating this amazing application launcher!**
-
----
-
-# Category Modes Extension
-
-This fork adds category-based application launcher modes to Rofi, allowing you to filter applications by standard FreeDesktop.org categories with clickable buttons.
-
-## Category Modes
-
-- **Apps** - All applications (no filter)
-- **Accessories** - Utility tools and accessories
-- **Development** - Programming and development tools
-- **Graphics** - Image editors, viewers, and graphics applications
-- **Multimedia** - Audio/Video players and media applications
-- **Office** - Office suites, productivity, and document tools
-- **System** - System administration and monitoring tools
-- **Settings** - Configuration and settings applications
-- **Internet** - Web browsers, email clients, and communication apps
-
-## Usage
-
-Launch Rofi with category modes:
-
-```bash
-rofi -show Apps -modi 'Apps,Accessories,Development,Internet,Graphics,Multimedia,Office,System,Settings'
-```
-
-Category buttons will appear in the mode-switcher at the bottom of the window. Click any category to filter applications by that category.
-
-### With Theme
-
-To enable the mode-switcher in your theme, ensure your theme's `mainbox` includes `mode-switcher`:
-
-```css
-mainbox {
-    children: [ inputbar, listview, mode-switcher ];
-}
-```
+I also added my own theme to theme directory everforest-categories.rasi
 
 ---
 
 **Thanks to the original Rofi developers and contributors for creating this amazing application launcher!**
 
 ---
+
+Previews:
+
+![Demo](screenshots/rofi-edit.gif)
+![Screenshot 1](screenshots/rofi_edit_01.png)
+![Screenshot 2](screenshots/rofi_edit_02.png)
+![Screenshot 3](screenshots/rofi_edit_03.png)
+![Screenshot 4](screenshots/rofi_edit_04.png)
 
 <p align="center">
 <a href="https://github.com/davatorium/rofi/issues"><img src="https://img.shields.io/github/issues/davatorium/rofi.svg"></a>

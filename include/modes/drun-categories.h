@@ -2,7 +2,7 @@
  * rofi
  *
  * MIT/X11 License
- * Copyright © 2013-2017 Qball Cow <qball@gmpclient.org>
+ * Copyright © 2013-2023 Qball Cow <qball@gmpclient.org>
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -25,26 +25,28 @@
  *
  */
 
-#ifndef ROFI_MODES_MODES_H
-#define ROFI_MODES_MODES_H
+#ifndef ROFI_MODE_DRUN_CATEGORIES_H
+#define ROFI_MODE_DRUN_CATEGORIES_H
+#include <config.h>
+#include "mode.h"
 
 /**
- * @defgroup MODES Modes
+ * @defgroup DRunCategoriesMode DRunCategories
+ * @ingroup MODES
+ *
+ * Desktop application launcher modes filtered by category.
+ * Each category appears as a separate mode in the mode switcher.
+ *
+ * @{
  */
-/**
- * List of available modes.
- */
-
-#include "modes/combi.h"
-#include "modes/dmenu.h"
-#include "modes/drun.h"
-#include "modes/drun-categories.h"
-#include "modes/filebrowser.h"
-#include "modes/recursivebrowser.h"
-#include "modes/help-keys.h"
-#include "modes/run.h"
-#include "modes/script.h"
-#include "modes/ssh.h"
-#include "modes/wayland-window.h"
-#include "modes/window.h"
-#endif // ROFI_MODES_MODES_H
+extern Mode drun_all_mode;
+extern Mode drun_accessories_mode;
+extern Mode drun_development_mode;
+extern Mode drun_graphics_mode;
+extern Mode drun_multimedia_mode;
+extern Mode drun_office_mode;
+extern Mode drun_system_mode;
+extern Mode drun_settings_mode;
+extern Mode drun_internet_mode;
+/*@}*/
+#endif // ROFI_MODE_DRUN_CATEGORIES_H

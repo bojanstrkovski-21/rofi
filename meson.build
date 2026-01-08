@@ -251,6 +251,7 @@ rofi_sources = files(
         'source/modes/run.c',
         'source/modes/ssh.c',
         'source/modes/drun.c',
+        'source/modes/drun-categories.c',
         'source/modes/dmenu.c',
         'source/modes/combi.c',
         'source/modes/script.c',

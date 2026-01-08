@@ -691,6 +691,15 @@ static void rofi_collect_modes(void) {
   rofi_collectmodes_add(&ssh_mode);
 #ifdef ENABLE_DRUN
   rofi_collectmodes_add(&drun_mode);
+  rofi_collectmodes_add(&drun_all_mode);
+  rofi_collectmodes_add(&drun_accessories_mode);
+  rofi_collectmodes_add(&drun_development_mode);
+  rofi_collectmodes_add(&drun_graphics_mode);
+  rofi_collectmodes_add(&drun_multimedia_mode);
+  rofi_collectmodes_add(&drun_office_mode);
+  rofi_collectmodes_add(&drun_system_mode);
+  rofi_collectmodes_add(&drun_settings_mode);
+  rofi_collectmodes_add(&drun_internet_mode);
 #endif
   rofi_collectmodes_add(&combi_mode);
   rofi_collectmodes_add(&help_keys_mode);

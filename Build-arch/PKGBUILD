@@ -1,0 +1,47 @@
+# Maintainer: Bojan Strkovski
+pkgname=rofi-categories
+pkgver=2.0.0
+pkgrel=1
+pkgdesc="Rofi with category mode buttons for filtering applications"
+arch=('x86_64')
+url="https://github.com/bojanstrkovski-21/rofi"
+license=('MIT')
+depends=('bash' 'cairo' 'gdk-pixbuf2' 'glib2' 'glibc' 'hicolor-icon-theme' 'libxcb'
+         'libxkbcommon' 'libxkbcommon-x11' 'pango' 'startup-notification' 'wayland'
+         'xcb-imdkit' 'xcb-util' 'xcb-util-cursor' 'xcb-util-keysyms' 'xcb-util-wm')
+makedepends=('check' 'git' 'meson' 'pandoc' 'wayland-protocols')
+provides=('rofi' 'rofi-wayland')
+conflicts=('rofi')
+source=("rofi-categories::git+https://github.com/bojanstrkovski-21/rofi.git#branch=next"
+        'libgwater::git+https://github.com/sardemff7/libgwater.git'
+        'libnkutils::git+https://github.com/sardemff7/libnkutils.git')
+sha256sums=('SKIP'
+            'SKIP'
+            'SKIP')
+
+prepare() {
+  cd "${srcdir}/rofi-categories"
+  
+  git submodule init
+  git config submodule.subprojects/libgwater.url "${srcdir}/libgwater"
+  git config submodule.subprojects/libnkutils.url "${srcdir}/libnkutils"
+  git -c protocol.file.allow=always submodule update
+}
+
+build() {
+  cd "${srcdir}/rofi-categories"
+  meson setup build --prefix=/usr --buildtype=release
+  meson compile -C build
+}
+
+check() {
+  cd "${srcdir}/rofi-categories"
+  meson test -C build --print-errorlogs || true
+}
+
+package() {
+  cd "${srcdir}/rofi-categories"
+  meson install -C build --destdir="$pkgdir"
+  install -Dm644 COPYING "$pkgdir/usr/share/licenses/$pkgname/COPYING"
+  install -Dm755 Examples/*.sh -t "$pkgdir/usr/share/doc/$pkgname/examples"
+}

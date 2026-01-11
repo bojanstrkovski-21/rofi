@@ -1351,6 +1351,10 @@ static void drun_mode_parse_display_format(void) {
   }
 }
 
+// Forward declarations for functions used in drun_mode_result
+static int drun_mode_init(Mode *sw);
+static void drun_mode_destroy(Mode *sw);
+
 static int drun_mode_init(Mode *sw) {
   if (mode_get_private_data(sw) != NULL) {
     return TRUE;

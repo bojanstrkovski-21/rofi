@@ -1375,7 +1375,18 @@ static int drun_mode_init(Mode *sw) {
   // Initialize category filtering based on mode name
   const char *mode_name = mode_get_name(sw);
   pd->current_category = NULL;
-  pd->available_categories = NULL;
+  
+  // Initialize available categories array for keyboard shortcuts (keys 1-8)
+  pd->available_categories = g_malloc0(9 * sizeof(char *));  // 8 categories + NULL terminator
+  pd->available_categories[0] = g_strdup("Utility");      // Key 1: Accessories
+  pd->available_categories[1] = g_strdup("Development");  // Key 2: Development
+  pd->available_categories[2] = g_strdup("Graphics");     // Key 3: Graphics
+  pd->available_categories[3] = g_strdup("AudioVideo");   // Key 4: Multimedia
+  pd->available_categories[4] = g_strdup("Office");       // Key 5: Office
+  pd->available_categories[5] = g_strdup("System");       // Key 6: System
+  pd->available_categories[6] = g_strdup("Settings");     // Key 7: Settings
+  pd->available_categories[7] = g_strdup("Network");      // Key 8: Internet
+  pd->available_categories[8] = NULL;
   
   g_debug("Initializing mode: %s", mode_name);
   

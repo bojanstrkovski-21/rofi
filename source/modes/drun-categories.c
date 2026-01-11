@@ -1507,8 +1507,57 @@ static ModeMode drun_mode_result(Mode *sw, int mretv, char **input,
     // Keys 1-8 map to categories
     if (custom_key >= 1 && custom_key <= 8) {
       if (rmpd->available_categories && rmpd->available_categories[custom_key - 1]) {
+        // Store the new category
+        char *new_category = rmpd->available_categories[custom_key - 1];
+        
+        g_debug("Switching to category: %s", new_category);
+        
+        // Destroy and reinit the mode with new category
+        drun_mode_destroy(sw);
+        drun_mode_init(sw);
+        
+        // Get the new private data after reinit
+        rmpd = (DRunModePrivateData *)mode_get_private_data(sw);
+        
+        // Set the desired category
         g_free(rmpd->current_category);
-        rmpd->current_category = g_strdup(rmpd->available_categories[custom_key - 1]);
+        rmpd->current_category = g_strdup(new_category);
+        
+        // Re-filter apps for this category
+        unsigned int original_count = rmpd->cmd_list_length;
+        unsigned int filtered_count = 0;
+        DRunModeEntry *filtered_list = g_malloc0(rmpd->cmd_list_length * sizeof(DRunModeEntry));
+        
+        for (unsigned int i = 0; i < rmpd->cmd_list_length; i++) {
+          DRunModeEntry *entry = &(rmpd->entry_list[i]);
+          
+          if (entry->categories != NULL) {
+            gboolean matches = FALSE;
+            
+            for (int j = 0; entry->categories[j] != NULL; j++) {
+              if (g_strcmp0(entry->categories[j], new_category) == 0) {
+                matches = TRUE;
+                break;
+              }
+            }
+            
+            if (matches) {
+              filtered_list[filtered_count] = *entry;
+              filtered_count++;
+            } else {
+              drun_entry_clear(entry);
+            }
+          } else {
+            drun_entry_clear(entry);
+          }
+        }
+        
+        g_debug("Filtered from %u to %u apps for category %s", original_count, filtered_count, new_category);
+        
+        g_free(rmpd->entry_list);
+        rmpd->entry_list = filtered_list;
+        rmpd->cmd_list_length = filtered_count;
+        
         return RELOAD_DIALOG;
       }
     }

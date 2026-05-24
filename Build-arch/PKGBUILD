@@ -1,7 +1,7 @@
 # Maintainer: Bojan Strkovski
 pkgname=rofi-categories
 pkgver=2.0.0
-pkgrel=10
+pkgrel=11
 pkgdesc="Rofi with category mode buttons for filtering applications"
 arch=('x86_64')
 url="https://github.com/bojanstrkovski-21/rofi"

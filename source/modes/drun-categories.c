@@ -1455,54 +1455,68 @@ static ModeMode drun_mode_result(Mode *sw, int mretv, char **input,
     int cat_idx = custom_key - 10;
     if (cat_idx >= 0 && cat_idx <= 8 &&
         rmpd->available_categories && rmpd->available_categories[cat_idx]) {
-      const char *new_category = rmpd->available_categories[cat_idx];
+
+      // Copy before any freeing — available_categories lives in rmpd
+      char *new_category = g_strdup(rmpd->available_categories[cat_idx]);
       gboolean is_all = (g_strcmp0(new_category, "All") == 0);
 
       g_debug("Switching to category: %s", new_category);
 
-      // Destroy and reinit to reload full app list
-      drun_mode_destroy(sw);
-      drun_mode_init(sw);
+      // Clear existing entry list
+      for (size_t i = 0; i < rmpd->cmd_list_length; i++) {
+        drun_entry_clear(&(rmpd->entry_list[i]));
+      }
+      g_free(rmpd->entry_list);
+      rmpd->entry_list = NULL;
+      rmpd->cmd_list_length = 0;
+      rmpd->cmd_list_length_actual = 0;
 
-      // Get the new private data after reinit
-      rmpd = (DRunModePrivateData *)mode_get_private_data(sw);
+      // Reset disabled-entries so the full app list can be re-read
+      g_hash_table_remove_all(rmpd->disabled_entries);
 
-      if (!is_all) {
-        // Set category filter and re-filter app list
-        g_free(rmpd->current_category);
-        rmpd->current_category = g_strdup(new_category);
+      // Update the category filter (NULL = show all)
+      g_free(rmpd->current_category);
+      rmpd->current_category = is_all ? NULL : new_category;
+      if (is_all) {
+        g_free(new_category);
+      }
 
+      // Reload all desktop entries
+      get_apps(rmpd);
+
+      // Apply category filter if not "All"
+      if (!is_all && rmpd->current_category != NULL) {
         unsigned int filtered_count = 0;
-        DRunModeEntry *filtered_list = g_malloc0(rmpd->cmd_list_length * sizeof(DRunModeEntry));
+        DRunModeEntry *filtered_list =
+            g_malloc0(rmpd->cmd_list_length * sizeof(DRunModeEntry));
 
         for (unsigned int i = 0; i < rmpd->cmd_list_length; i++) {
           DRunModeEntry *entry = &(rmpd->entry_list[i]);
+          gboolean matches = FALSE;
 
           if (entry->categories != NULL) {
-            gboolean matches = FALSE;
             for (int j = 0; entry->categories[j] != NULL; j++) {
-              if (g_strcmp0(entry->categories[j], new_category) == 0) {
+              if (g_strcmp0(entry->categories[j], rmpd->current_category) == 0) {
                 matches = TRUE;
                 break;
               }
             }
-            if (matches) {
-              filtered_list[filtered_count++] = *entry;
-            } else {
-              drun_entry_clear(entry);
-            }
+          }
+
+          if (matches) {
+            filtered_list[filtered_count++] = *entry;
           } else {
             drun_entry_clear(entry);
           }
         }
 
-        g_debug("Filtered to %u apps for category %s", filtered_count, new_category);
+        g_debug("Filtered to %u apps for category %s", filtered_count,
+                rmpd->current_category);
 
         g_free(rmpd->entry_list);
         rmpd->entry_list = filtered_list;
         rmpd->cmd_list_length = filtered_count;
       }
-      // is_all: reinit already loaded all apps with current_category = NULL
 
       return RELOAD_DIALOG;
     }

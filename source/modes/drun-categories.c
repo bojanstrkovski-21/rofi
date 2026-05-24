@@ -1323,14 +1323,14 @@ static int drun_mode_init(Mode *sw) {
   const char *mode_name = mode_get_name(sw);
   pd->current_category = NULL;
   
-  // Initialize available categories array for Alt+Shift+1-9 keyboard shortcuts
-  pd->available_categories = g_malloc0(10 * sizeof(char *));  // 9 categories + NULL terminator
-  pd->available_categories[0] = g_strdup("All");          // Alt+Shift+1: Apps (all)
-  pd->available_categories[1] = g_strdup("Utility");      // Alt+Shift+2: Accessories
+  // Mode names for Alt+Shift+1-9 — used to do a MENU_QUICK_SWITCH to the right mode
+  pd->available_categories = g_malloc0(10 * sizeof(char *));  // 9 modes + NULL terminator
+  pd->available_categories[0] = g_strdup("Apps");         // Alt+Shift+1
+  pd->available_categories[1] = g_strdup("Accessories");  // Alt+Shift+2
   pd->available_categories[2] = g_strdup("Development");  // Alt+Shift+3
   pd->available_categories[3] = g_strdup("Graphics");     // Alt+Shift+4
-  pd->available_categories[4] = g_strdup("AudioVideo");   // Alt+Shift+5: Multimedia
-  pd->available_categories[5] = g_strdup("Network");      // Alt+Shift+6: Internet
+  pd->available_categories[4] = g_strdup("Multimedia");   // Alt+Shift+5
+  pd->available_categories[5] = g_strdup("Internet");     // Alt+Shift+6
   pd->available_categories[6] = g_strdup("Office");       // Alt+Shift+7
   pd->available_categories[7] = g_strdup("System");       // Alt+Shift+8
   pd->available_categories[8] = g_strdup("Settings");     // Alt+Shift+9
@@ -1455,70 +1455,16 @@ static ModeMode drun_mode_result(Mode *sw, int mretv, char **input,
     int cat_idx = custom_key - 10;
     if (cat_idx >= 0 && cat_idx <= 8 &&
         rmpd->available_categories && rmpd->available_categories[cat_idx]) {
+      const char *target_name = rmpd->available_categories[cat_idx];
+      g_debug("Switching to mode: %s", target_name);
 
-      // Copy before any freeing — available_categories lives in rmpd
-      char *new_category = g_strdup(rmpd->available_categories[cat_idx]);
-      gboolean is_all = (g_strcmp0(new_category, "All") == 0);
-
-      g_debug("Switching to category: %s", new_category);
-
-      // Clear existing entry list
-      for (size_t i = 0; i < rmpd->cmd_list_length; i++) {
-        drun_entry_clear(&(rmpd->entry_list[i]));
-      }
-      g_free(rmpd->entry_list);
-      rmpd->entry_list = NULL;
-      rmpd->cmd_list_length = 0;
-      rmpd->cmd_list_length_actual = 0;
-
-      // Reset disabled-entries so the full app list can be re-read
-      g_hash_table_remove_all(rmpd->disabled_entries);
-
-      // Update the category filter (NULL = show all)
-      g_free(rmpd->current_category);
-      rmpd->current_category = is_all ? NULL : new_category;
-      if (is_all) {
-        g_free(new_category);
-      }
-
-      // Reload all desktop entries
-      get_apps(rmpd);
-
-      // Apply category filter if not "All"
-      if (!is_all && rmpd->current_category != NULL) {
-        unsigned int filtered_count = 0;
-        DRunModeEntry *filtered_list =
-            g_malloc0(rmpd->cmd_list_length * sizeof(DRunModeEntry));
-
-        for (unsigned int i = 0; i < rmpd->cmd_list_length; i++) {
-          DRunModeEntry *entry = &(rmpd->entry_list[i]);
-          gboolean matches = FALSE;
-
-          if (entry->categories != NULL) {
-            for (int j = 0; entry->categories[j] != NULL; j++) {
-              if (g_strcmp0(entry->categories[j], rmpd->current_category) == 0) {
-                matches = TRUE;
-                break;
-              }
-            }
-          }
-
-          if (matches) {
-            filtered_list[filtered_count++] = *entry;
-          } else {
-            drun_entry_clear(entry);
-          }
+      // Find the mode index by name and do a real mode switch so the
+      // mode-switcher button updates correctly.
+      for (unsigned int i = 0; i < rofi_get_num_enabled_modes(); i++) {
+        if (g_strcmp0(mode_get_name(rofi_get_mode(i)), target_name) == 0) {
+          return MENU_QUICK_SWITCH | (i & MENU_LOWER_MASK);
         }
-
-        g_debug("Filtered to %u apps for category %s", filtered_count,
-                rmpd->current_category);
-
-        g_free(rmpd->entry_list);
-        rmpd->entry_list = filtered_list;
-        rmpd->cmd_list_length = filtered_count;
       }
-
-      return RELOAD_DIALOG;
     }
   }
 

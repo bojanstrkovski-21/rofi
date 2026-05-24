@@ -1,7 +1,7 @@
 # Maintainer: Bojan Strkovski
 pkgname=rofi-categories
 pkgver=2.0.0
-pkgrel=15
+pkgrel=16
 pkgdesc="Rofi with category mode buttons for filtering applications"
 arch=('x86_64')
 url="https://github.com/bojanstrkovski-21/rofi"
@@ -20,15 +20,13 @@ sha256sums=('SKIP'
             'SKIP')
 
 prepare() {
-  # Prevent git from walking up into the outer repository when srcdir is
-  # nested inside another git repo (e.g. building from inside the dev tree)
-  export GIT_CEILING_DIRECTORIES="${srcdir}"
   cd "${srcdir}/rofi-categories"
 
-  git submodule init
-  git config submodule.subprojects/libgwater.url "${srcdir}/libgwater"
-  git config submodule.subprojects/libnkutils.url "${srcdir}/libnkutils"
-  git -c protocol.file.allow=always submodule update
+  # Copy pre-cloned submodule sources directly instead of using git submodule
+  # commands, which break when srcdir is nested inside another git repository.
+  rm -rf subprojects/libgwater subprojects/libnkutils
+  cp -a "${srcdir}/libgwater" subprojects/libgwater
+  cp -a "${srcdir}/libnkutils" subprojects/libnkutils
 }
 
 build() {

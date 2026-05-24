@@ -3,8 +3,8 @@
 /.vscode/
 
 # Arch package build directory
-Build-arch/*
-!Build-arch/PKGBUILD
+#Build-arch/*
+#!Build-arch/PKGBUILD
 
 # I want to ignore log files
 *.log

@@ -1323,17 +1323,18 @@ static int drun_mode_init(Mode *sw) {
   const char *mode_name = mode_get_name(sw);
   pd->current_category = NULL;
   
-  // Initialize available categories array for keyboard shortcuts (keys 1-8)
-  pd->available_categories = g_malloc0(9 * sizeof(char *));  // 8 categories + NULL terminator
-  pd->available_categories[0] = g_strdup("Utility");      // Key 1: Accessories
-  pd->available_categories[1] = g_strdup("Development");  // Key 2: Development
-  pd->available_categories[2] = g_strdup("Graphics");     // Key 3: Graphics
-  pd->available_categories[3] = g_strdup("AudioVideo");   // Key 4: Multimedia
-  pd->available_categories[4] = g_strdup("Office");       // Key 5: Office
-  pd->available_categories[5] = g_strdup("System");       // Key 6: System
-  pd->available_categories[6] = g_strdup("Settings");     // Key 7: Settings
-  pd->available_categories[7] = g_strdup("Network");      // Key 8: Internet
-  pd->available_categories[8] = NULL;
+  // Initialize available categories array for Alt+Shift+1-9 keyboard shortcuts
+  pd->available_categories = g_malloc0(10 * sizeof(char *));  // 9 categories + NULL terminator
+  pd->available_categories[0] = g_strdup("All");          // Alt+Shift+1: Apps (all)
+  pd->available_categories[1] = g_strdup("Utility");      // Alt+Shift+2: Accessories
+  pd->available_categories[2] = g_strdup("Development");  // Alt+Shift+3
+  pd->available_categories[3] = g_strdup("Graphics");     // Alt+Shift+4
+  pd->available_categories[4] = g_strdup("AudioVideo");   // Alt+Shift+5: Multimedia
+  pd->available_categories[5] = g_strdup("Network");      // Alt+Shift+6: Internet
+  pd->available_categories[6] = g_strdup("Office");       // Alt+Shift+7
+  pd->available_categories[7] = g_strdup("System");       // Alt+Shift+8
+  pd->available_categories[8] = g_strdup("Settings");     // Alt+Shift+9
+  pd->available_categories[9] = NULL;
   
   g_debug("Initializing mode: %s", mode_name);
   
@@ -1448,49 +1449,45 @@ static ModeMode drun_mode_result(Mode *sw, int mretv, char **input,
   DRunModePrivateData *rmpd = (DRunModePrivateData *)mode_get_private_data(sw);
   ModeMode retv = MODE_EXIT;
 
-  // Handle category switching with number keys 1-8
+  // Handle category switching with Alt+Shift+1-9 (CUSTOM_11-19, custom_key 10-18)
   if (mretv & MENU_CUSTOM_COMMAND) {
     int custom_key = (mretv & MENU_LOWER_MASK);
-    // Keys 1-8 map to categories
-    if (custom_key >= 1 && custom_key <= 8) {
-      if (rmpd->available_categories && rmpd->available_categories[custom_key - 1]) {
-        // Store the new category
-        char *new_category = rmpd->available_categories[custom_key - 1];
-        
-        g_debug("Switching to category: %s", new_category);
-        
-        // Destroy and reinit the mode with new category
-        drun_mode_destroy(sw);
-        drun_mode_init(sw);
-        
-        // Get the new private data after reinit
-        rmpd = (DRunModePrivateData *)mode_get_private_data(sw);
-        
-        // Set the desired category
+    int cat_idx = custom_key - 10;
+    if (cat_idx >= 0 && cat_idx <= 8 &&
+        rmpd->available_categories && rmpd->available_categories[cat_idx]) {
+      const char *new_category = rmpd->available_categories[cat_idx];
+      gboolean is_all = (g_strcmp0(new_category, "All") == 0);
+
+      g_debug("Switching to category: %s", new_category);
+
+      // Destroy and reinit to reload full app list
+      drun_mode_destroy(sw);
+      drun_mode_init(sw);
+
+      // Get the new private data after reinit
+      rmpd = (DRunModePrivateData *)mode_get_private_data(sw);
+
+      if (!is_all) {
+        // Set category filter and re-filter app list
         g_free(rmpd->current_category);
         rmpd->current_category = g_strdup(new_category);
-        
-        // Re-filter apps for this category
-        unsigned int original_count = rmpd->cmd_list_length;
+
         unsigned int filtered_count = 0;
         DRunModeEntry *filtered_list = g_malloc0(rmpd->cmd_list_length * sizeof(DRunModeEntry));
-        
+
         for (unsigned int i = 0; i < rmpd->cmd_list_length; i++) {
           DRunModeEntry *entry = &(rmpd->entry_list[i]);
-          
+
           if (entry->categories != NULL) {
             gboolean matches = FALSE;
-            
             for (int j = 0; entry->categories[j] != NULL; j++) {
               if (g_strcmp0(entry->categories[j], new_category) == 0) {
                 matches = TRUE;
                 break;
               }
             }
-            
             if (matches) {
-              filtered_list[filtered_count] = *entry;
-              filtered_count++;
+              filtered_list[filtered_count++] = *entry;
             } else {
               drun_entry_clear(entry);
             }
@@ -1498,15 +1495,16 @@ static ModeMode drun_mode_result(Mode *sw, int mretv, char **input,
             drun_entry_clear(entry);
           }
         }
-        
-        g_debug("Filtered from %u to %u apps for category %s", original_count, filtered_count, new_category);
-        
+
+        g_debug("Filtered to %u apps for category %s", filtered_count, new_category);
+
         g_free(rmpd->entry_list);
         rmpd->entry_list = filtered_list;
         rmpd->cmd_list_length = filtered_count;
-        
-        return RELOAD_DIALOG;
       }
+      // is_all: reinit already loaded all apps with current_category = NULL
+
+      return RELOAD_DIALOG;
     }
   }
 

@@ -696,10 +696,10 @@ static void rofi_collect_modes(void) {
   rofi_collectmodes_add(&drun_development_mode);
   rofi_collectmodes_add(&drun_graphics_mode);
   rofi_collectmodes_add(&drun_multimedia_mode);
+  rofi_collectmodes_add(&drun_internet_mode);
   rofi_collectmodes_add(&drun_office_mode);
   rofi_collectmodes_add(&drun_system_mode);
   rofi_collectmodes_add(&drun_settings_mode);
-  rofi_collectmodes_add(&drun_internet_mode);
 #endif
   rofi_collectmodes_add(&combi_mode);
   rofi_collectmodes_add(&help_keys_mode);

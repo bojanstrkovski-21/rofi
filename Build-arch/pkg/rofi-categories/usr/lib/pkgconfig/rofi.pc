@@ -1,0 +1,11 @@
+prefix=/usr
+includedir=${prefix}/include
+libdir=${prefix}/lib
+
+pluginsdir=${libdir}/rofi
+
+Name: rofi
+Description: Header files for rofi plugins
+Version: 2.0.0-dev
+Requires.private: glib-2.0 >=  2.72, gmodule-2.0, cairo
+Cflags: -I${includedir}

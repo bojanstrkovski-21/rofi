@@ -1462,7 +1462,7 @@ static ModeMode drun_mode_result(Mode *sw, int mretv, char **input,
       // mode-switcher button updates correctly.
       for (unsigned int i = 0; i < rofi_get_num_enabled_modes(); i++) {
         if (g_strcmp0(mode_get_name(rofi_get_mode(i)), target_name) == 0) {
-          return MENU_QUICK_SWITCH | (i & MENU_LOWER_MASK);
+          return i;
         }
       }
     }
